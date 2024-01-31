@@ -16,13 +16,13 @@ const populate = {
     },
 };
 
-router.post('/addToCart', auth, async (req, res) => {
+router.post("/addToCart", auth, async (req, res) => {
     try {
+        const product = await Product.findById(req.body._productId);
         const customerCart = await Cart.findOne({
-            _customerId: req.customer._id,
+            _customerId: req.customerId,
         });
 
-        const product = await Product.findById(req.body._productId);
         const cartDetails = {
             _product: req.body._productId,
             quantity: req.body.quantity,
@@ -31,43 +31,46 @@ router.post('/addToCart', auth, async (req, res) => {
         };
 
         if (customerCart) {
-            const updatedCart = await Cart.findOneAndUpdate(
-                {
-                    _customerId: req.customer._id,
-                    'cartDetails._product': req.body._productId,
-                },
-                {
-                    $inc: {
-                        'cartDetails.$.quantity': req.body.quantity,
-                        'cartDetails.$.amount': product.price * req.body.quantity,
-                    },
-                },
-                { new: true }
-            ).populate(populate);
+            // Check if the product is already in the cart
+            const existingProductIndex = customerCart.cartDetails.findIndex(item => item._product.equals(req.body._productId));
 
+            if (existingProductIndex !== -1) {
+                // If the product is already in the cart, update the quantity and amount
+                customerCart.cartDetails[existingProductIndex].quantity += req.body.quantity;
+                customerCart.cartDetails[existingProductIndex].amount += product.price * req.body.quantity;
+                await customerCart.save();
 
-            if (updatedCart) {
                 return res.status(200).json({
                     status: true,
-                    message: 'Item is added/updated successfully',
-                    data: updatedCart,
+                    message: 'Product quantity updated successfully',
+                    data: customerCart,
+                });
+            } else {
+                // If the product is not in the cart, add it
+                customerCart.cartDetails.push(cartDetails);
+                await customerCart.save();
+
+                return res.status(200).json({
+                    status: true,
+                    message: "Product added to cart successfully",
+                    data: customerCart,
                 });
             }
+        } else {
+            // If the customer doesn't have a cart, create a new one
+            const newCart = new Cart({
+                _customerId: req.customerId,
+                cartDetails: [cartDetails],
+            });
+
+            const savedCart = await newCart.save();
+
+            return res.status(200).json({
+                status: true,
+                message: 'Product added to cart successfully',
+                data: savedCart,
+            });
         }
-
-        const newCart = new Cart({
-            _customerId: req.customer._id,
-            cartDetails: [cartDetails],
-        });
-
-        const savedCart = await newCart.save();
-        const populatedCart = await Cart.findById(savedCart._id).populate(populate);
-
-        return res.status(200).json({
-            status: true,
-            message: 'Item is added successfully',
-            data: populatedCart,
-        });
     } catch (error) {
         return res.status(500).json({
             status: false,

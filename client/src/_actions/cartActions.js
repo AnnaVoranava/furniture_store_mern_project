@@ -23,7 +23,7 @@ export default function useCarts() {
         }
     };
 
-    const getCartItem = async () => {
+    const getCartItems = async () => {
         try {
             const result = await axios.get('/carts', config);
             dispatch({
@@ -38,7 +38,7 @@ export default function useCarts() {
     };
 
     return {
-        getCartItem,
+        getCartItems,
         addToCart,
     };
 }

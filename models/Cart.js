@@ -8,7 +8,7 @@ const cartSchema =mongoose.Schema({
 
 },
 cartDetails:[
-    {type: orderDetailSchema,},
-],})
+    {type: orderDetailSchema}
+],});
 const Cart = mongoose.model('carts', cartSchema);
 module.exports={Cart};

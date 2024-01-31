@@ -7,7 +7,7 @@ import useCarts from "./_actions/cartActions";
 function Auth({ authRoute, redirectTo, children }) {
   let auth = useSelector((state) => state.customer.auth);
   const { customerAuth } = useCustomers();
-  const {getCartItem} = useCarts();
+  const {getCartItems} = useCarts();
   const dispatch = useDispatch();
   let navigate = useNavigate();
 
@@ -18,8 +18,9 @@ function Auth({ authRoute, redirectTo, children }) {
           navigate(redirectTo);
         }
       } else {
+        getCartItems ();
         if (!authRoute) {
-          getCartItem ();
+
           navigate(redirectTo);
         }
       }

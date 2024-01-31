@@ -1,8 +1,8 @@
 const mongoose = require ("mongoose");
 const orderDetailSchema =mongoose.Schema({
-    _product:{
+    _product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'products',
+        ref: 'products',
         required: true
 
     },
@@ -13,9 +13,11 @@ const orderDetailSchema =mongoose.Schema({
         type: Number,
         required: true
     },
-    amount:{
-        type: Number},
-    },{versionKey: false, _id: false});
+    amount: {
+        type: Number
+    },
+},
+    {versionKey: false, _id: false});
 
 const OrderDetails = mongoose.model('orderDetails', orderDetailSchema);
 module.exports={OrderDetails};
