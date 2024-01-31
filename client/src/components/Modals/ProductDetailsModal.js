@@ -1,13 +1,33 @@
 import React, {useState} from "react";
 import {Button, Row, Col, Image, InputNumber, Modal, Space, Typography, message} from "antd";
 import {ShoppingCartOutlined} from "@ant-design/icons";
- const  {Title, Text} =Typography;
+import useCarts from'../../_actions/cartActions';
+import {useDispatch} from "react-redux";
+
+const  {Title, Text} =Typography;
  function ProductDetailsModal (props) {
      const {product, visible, onCancel} =props;
+     const dispatch =useDispatch();
+     const {addToCart}= useCarts();
      const [quantity, setQuantity]= useState(1);
     const handleChangeQuantity =(value)=> {
         setQuantity(value);
     };
+     const handleAddToCart = (item) => {
+         const data = {
+             _productId: item._id,
+             quantity,
+         };
+
+         dispatch(addToCart(data)).then((res) => {
+             if (res.payload.status) {
+                 message.success(res.payload.message);
+                 setQuantity(1)
+             } else {
+                 message.error(res.payload.message);
+             }
+         });
+     };
      return (
          <Modal title={product?.name} width={700} visible={visible} onCancel={onCancel} footer={null}>
              <Row gutter={12}>

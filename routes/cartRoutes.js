@@ -45,6 +45,7 @@ router.post('/addToCart', auth, async (req, res) => {
                 { new: true }
             ).populate(populate);
 
+
             if (updatedCart) {
                 return res.status(200).json({
                     status: true,
