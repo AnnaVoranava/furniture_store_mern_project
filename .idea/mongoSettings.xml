@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MongoConfiguration">
+    <option name="serverConfigurations">
+      <set>
+        <ServerConfiguration>
+          <option name="authenticationDatabase" value="app-auth" />
+          <option name="label" value="app-auth" />
+          <option name="password" value="lNLliExdwAus8dbJ" />
+          <option name="serverUrls">
+            <list>
+              <option value="localhost:27017" />
+            </list>
+          </option>
+          <option name="shellWorkingDir" value="null" />
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
+          <option name="userDatabase" value="app-auth" />
+          <option name="username" value="afonna85" />
+        </ServerConfiguration>
+        <ServerConfiguration>
+          <option name="label" value="mongodb" />
+          <option name="serverUrls">
+            <list>
+              <option value="localhost:27017" />
+            </list>
+          </option>
+          <option name="shellWorkingDir" value="null" />
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
+          <option name="userDatabase" value="app-auth" />
+        </ServerConfiguration>
+      </set>
+    </option>
+  </component>
+</project>
