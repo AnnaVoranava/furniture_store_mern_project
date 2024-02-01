@@ -13,21 +13,23 @@ const  {Title, Text} =Typography;
     const handleChangeQuantity =(value)=> {
         setQuantity(value);
     };
-     const handleAddToCart = (item) => {
+     const handleAddToCart = () => {
          const data = {
-             _productId: item._id,
+             _productId: product._id,
              quantity,
          };
 
          dispatch(addToCart(data)).then((res) => {
              if (res.payload.status) {
                  message.success(res.payload.message);
-                 setQuantity(1)
+                 setQuantity(1);
              } else {
                  message.error(res.payload.message);
              }
          });
      };
+
+
      return (
          <Modal title={product?.name} width={700} visible={visible} onCancel={onCancel} footer={null}>
              <Row gutter={12}>
@@ -42,7 +44,7 @@ const  {Title, Text} =Typography;
                          <Text italic>{product?.description}</Text>
                          <Space direction={'horizontal'}></Space>
                          <InputNumber min={1} value={quantity} onChange={handleChangeQuantity}/>
-                         <Button type={'primary'} icon= {<ShoppingCartOutlined style={{fontSize:18}}/>}>Add to Cart</Button>
+                         <Button type={'primary'} icon= {<ShoppingCartOutlined style={{fontSize:18}} onClick={() => handleAddToCart()}/>}>Add to Cart</Button>
                      </Space>
                  </Col>
              </Row>

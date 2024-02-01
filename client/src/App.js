@@ -13,6 +13,7 @@ import Register from "./containers/Register";
 import ResetPassword from "./containers/ResetPassword";
 import useCustomers from "./_actions/customerActions";
 import useCarts from "./_actions/cartActions";
+import Cart from './containers/Cart';
 
 const {Header, Content, Footer} = Layout;
 const {SubMenu} = Menu;
@@ -72,7 +73,7 @@ function App() {
                             <Menu.Item key="login">
                                 <Link to="login">Login</Link>
                             </Menu.Item>
-                            <Menu.Item key="register">
+                             <Menu.Item key="register">
                                 <Link to="register">Register</Link>
                             </Menu.Item>
                         </>
@@ -109,6 +110,15 @@ function App() {
                                     </Auth>
                                 }
                             />
+                            <Route
+                                path="/cart"
+                                element={
+                                    <Auth authRoute={true} redirectTo="/login">
+                                        <Cart />
+                                    </Auth>
+                                }
+                            />
+
                             <Route
                                 path="/login"
                                 element={

@@ -22,7 +22,6 @@ router.post("/addToCart", auth, async (req, res) => {
         const customerCart = await Cart.findOne({
             _customerId: req.customerId,
         });
-
         const cartDetails = {
             _product: req.body._productId,
             quantity: req.body.quantity,
@@ -31,44 +30,54 @@ router.post("/addToCart", auth, async (req, res) => {
         };
 
         if (customerCart) {
-            // Check if the product is already in the cart
-            const existingProductIndex = customerCart.cartDetails.findIndex(item => item._product.equals(req.body._productId));
+            const updatedCart = await Cart.findOneAndUpdate(
+                {
+                    _customerId: req.customerId,
+                    "cartDetails._product": req.body._productId,
+                },
+                {
+                    $inc: {
+                        'cartDetails.$.quantity': req.body.quantity,
+                        'cartDetails.$.amount': product.price * req.body.quantity,
+                    },
+                },
+                { new: true }
+            ).populate(populate);
 
-            if (existingProductIndex !== -1) {
-                // If the product is already in the cart, update the quantity and amount
-                customerCart.cartDetails[existingProductIndex].quantity += req.body.quantity;
-                customerCart.cartDetails[existingProductIndex].amount += product.price * req.body.quantity;
-                await customerCart.save();
-
+            if (updatedCart) {
                 return res.status(200).json({
                     status: true,
-                    message: 'Product quantity updated successfully',
-                    data: customerCart,
+                    message: 'Item is added/updated successfully',
+                    data: updatedCart,
                 });
             } else {
-                // If the product is not in the cart, add it
-                customerCart.cartDetails.push(cartDetails);
-                await customerCart.save();
+                const newCart = new Cart({
+                    _customerId: req.customerId,
+                    cartDetails: [cartDetails],
+                });
+
+                const savedCart = await newCart.save();
+                const populatedCart = await Cart.findById(savedCart._id).populate(populate);
 
                 return res.status(200).json({
                     status: true,
-                    message: "Product added to cart successfully",
-                    data: customerCart,
+                    message: 'Product is added successfully',
+                    data: populatedCart,
                 });
             }
         } else {
-            // If the customer doesn't have a cart, create a new one
             const newCart = new Cart({
                 _customerId: req.customerId,
                 cartDetails: [cartDetails],
             });
 
             const savedCart = await newCart.save();
+            const populatedCart = await Cart.findById(savedCart._id).populate(populate);
 
             return res.status(200).json({
                 status: true,
-                message: 'Product added to cart successfully',
-                data: savedCart,
+                message: 'Product is added successfully',
+                data: populatedCart,
             });
         }
     } catch (error) {
@@ -99,3 +108,4 @@ router.get('/', auth, async (req, res) => {
 });
 
 module.exports = router;
+
