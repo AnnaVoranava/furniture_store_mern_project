@@ -1,60 +1,60 @@
 import React from "react";
-import {PageHeader, Table, Space, Typography, Image} from "antd";
-import  {useSelector} from "react-redux";
+import {Image, PageHeader, Space, Table, Typography} from "antd";
+import {useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import Login from "./Login";
 
 function Cart() {
-    const navigate= useNavigate();
-    const cartItems = useSelector((state)=>state.cart.cartItems?.cartDetails)
-    const renderCartItems =()=> {
-        return(
-            <Table columns={columns} dataSource={cartItems || []} scroll={{ x: true }} />
+    const navigate = useNavigate();
+    const cartItems = useSelector((state) => state.cart.cartItems?.cartDetails)
+    const renderCartItems = () => {
+        return (
+            <Table columns={columns} dataSource={cartItems || []} scroll={{x: 1300}}/>
         )
     }
-    const columns= [
+    const columns = [
         {
-            title:"Product",
-
+            title: "Product",
+            width: 100,
             dataIndex: "_product",
             key: 'name',
-            render:(item)=> {
-                return(
-                <Space direction={"vertical"}>
-<Typography.Text strong>{item?.name}</Typography.Text>
-                    <Image src={item?.image} alt="image" width={100}></Image>
-                </Space>)
+            render: (item) => {
+                return (
+                    <Space direction={"vertical"}>
+                        <Typography.Text strong>{item?.name}</Typography.Text>
+                        <Image src={item?._productId?.image} alt="image" width={100}></Image>
+                    </Space>)
             },
-            fixed:"left"
+            fixed: "left"
         },
         {
             title: "Price ($)",
 
             dataIndex: "price",
-            key:"price",
-            align:'right'
+            key: "price",
+            align: 'right'
         },
         {
             title: "Quantity",
 
             dataIndex: "quantity",
-            key:"quantity",
-            align:'right'
+            key: "quantity",
+            align: 'right'
         },
         {
             title: "Amount ($)",
 
             dataIndex: "amount",
-            key:"amount",
-            align:'right'
+            key: "amount",
+            align: 'right'
         }
     ]
-    return(
+    return (
         <>
-            <PageHeader title="Your Cart" onBack={()=>navigate(-1)}/>
+            <PageHeader title="Your Cart" onBack={() => navigate(-1)}/>
             <div className="page-wrapper"></div>
             {renderCartItems()}
         </>
     )
 }
+
 export default Cart;
