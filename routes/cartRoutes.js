@@ -33,7 +33,7 @@ router.post("/addToCart", auth, async (req, res) => {
             _product: product,
             quantity: req.body.quantity,
             price: product.price,
-            amount: product.price * req.body.quantity,
+            amount: product.price * req.body.quantity.toFixed(2),
         };
 
         if (!userHasCart) {
@@ -80,7 +80,7 @@ router.post("/addToCart", auth, async (req, res) => {
             {
                 $inc: {
                     "cartDetails.$.quantity": req.body.quantity,
-                    "cartDetails.$.amount": product.price * req.body.quantity,
+                    "cartDetails.$.amount": product.price * req.body.quantity.toFixed(2),
                 },
             },
             { new: true },
@@ -125,6 +125,40 @@ router.get("/", auth, async (req, res) => {
             error: error.message,
         });
     }
+});
+
+router.put ("/updateCartItem", auth, async (req, res) =>{
+    const _productId= req.body._productId;
+    const quantity = req.body.quantity;
+    const product = await Product.findById(_productId);
+    Cart.findOneAndUpdate({_customerId: req.customerId, "cartDetails._product": _productId},
+    {$set:{"cartDetails.$.quantity":quantity,
+            "cartDetails.$amount": quantity * product.price
+         }}, {new: true}
+    ).populate(populate).exec((error, data)=>{
+        if(error) return res.status(400).json({status:false, error});
+        return  res.status(200).json({
+            status:true,
+            message: "Item in cart has been updated successfully!",
+            data,
+        });
+    });
+});
+
+router.put ("/removeCartItem/:id", auth, async (req, res) =>{
+    const _productId= req.params.id;
+
+    Cart.findOneAndUpdate({_customerId: req.customerId},
+        {$pull:{cartDetails: { _product: _productId}
+            }}, {new: true}
+    ).populate(populate).exec((error, data)=>{
+        if(error) return res.status(400).json({status:false, error});
+        return  res.status(200).json({
+            status:true,
+            message: "Item in cart has been removed successfully!",
+            data,
+        });
+    });
 });
 
 module.exports = router;

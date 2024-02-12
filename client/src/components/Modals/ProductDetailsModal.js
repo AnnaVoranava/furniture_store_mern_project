@@ -23,7 +23,7 @@ const  {Title, Text} =Typography;
              if (res.payload.status) {
                  message.success(res.payload.message);
                  setQuantity(1);
-             } else {
+                             } else {
                  message.error(res.payload.message);
              }
          });
