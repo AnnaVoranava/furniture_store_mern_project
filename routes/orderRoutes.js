@@ -18,12 +18,12 @@ const populate = {
 };
 router.post('/checkout', auth,(req, res)=>{
     Cart.findOne({_customerId: req.customerId}).exec(async (data, )=>{
-        if(error) return res.status(400).json({status:false, error})
+       // if(error) return res.status(400).json({status:false, error})
         const token = req.body.token;
         const totalAmount =req.body.total;
         const charge =await  stripe.charges.create({
             amount: totalAmount * 100,
-            currency:'used',
+            currency:'usd',
             description:'Payment for product',
             source:token.id,
         })
