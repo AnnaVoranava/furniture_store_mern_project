@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import {ADD_TO_CART, CHECKOUT, GET_ORDER_HISTORY} from './types';
+import {CHECKOUT, GET_ORDER_HISTORY} from './types';
 
 export default function useOrders() {
     const token = localStorage.getItem('customerToken');
@@ -24,7 +24,7 @@ export default function useOrders() {
     };
     const getOrderHistory =async () => {
         try {
-            const result = axios.post('/orders/orderHistory', config);
+            const result = axios.get('/orders/orderHistory', config);
             dispatch({
                 type: GET_ORDER_HISTORY,
                 payload: result,

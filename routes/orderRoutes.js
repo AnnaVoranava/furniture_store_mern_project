@@ -6,7 +6,7 @@ const {Cart}= require('../models/Cart');
 const{auth}= require('../middlewares/auth')
 
 const populate = {
-    path: "cartDetails",
+    path: "orderDetails",
     populate: {
         path: "_product",
         model: "products",
@@ -17,16 +17,16 @@ const populate = {
     },
 };
 router.post('/checkout', auth,(req, res)=>{
-    Cart.findOne({_customerId: req.customerId}).exec(async (data, )=>{
-       // if(error) return res.status(400).json({status:false, error})
+    Cart.findOne({_customerId: req.customerId}).exec(async (data, error)=>{
+       if(error) return res.status(400).json({status:false, error})
         const token = req.body.token;
         const totalAmount =req.body.total;
-        const charge =await  stripe.charges.create({
+        const charge = await stripe.charges.create({
             amount: totalAmount * 100,
-            currency:'usd',
-            description:'Payment for product',
-            source:token.id,
-        })
+            currency: 'usd',
+            description: 'Payment for product',
+            source: token.id,
+        });
         const orderData ={
             _customerId: data._customerId,
             orderDetails: data.cartDetails,
@@ -35,7 +35,7 @@ router.post('/checkout', auth,(req, res)=>{
             totalAmount
 
         }
-        const newOrder =Order (orderData);
+        const newOrder = Order (orderData);
         newOrder.save(async(error, data)=>{
             if(error) return res.status(400).json({status: false,error});
             else{
@@ -44,7 +44,8 @@ router.post('/checkout', auth,(req, res)=>{
                 });
                 return res.status(200).json({
                     status: true,
-                    message:'Order has been created successfully '
+                    message:'Order has been created successfully ',
+                    data
                 })
             }
         })
@@ -60,7 +61,7 @@ router.get ("/orderHistory", auth,(req,res)=>{
     if(error) return res.status(400).json({status: false,error});
             return res.status(200).json({
             status: true,
-            message: 'Get customer order history successfully '
+            message: 'Get customer order history successfully', data
         })
     })
 })

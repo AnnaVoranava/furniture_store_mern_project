@@ -33,7 +33,8 @@ router.post("/addToCart", auth, async (req, res) => {
             _product: product,
             quantity: req.body.quantity,
             price: product.price,
-            amount: product.price * req.body.quantity.toFixed(2),
+            amount: (product.price * req.body.quantity).toFixed(2)
+
         };
 
         if (!userHasCart) {
@@ -80,7 +81,7 @@ router.post("/addToCart", auth, async (req, res) => {
             {
                 $inc: {
                     "cartDetails.$.quantity": req.body.quantity,
-                    "cartDetails.$.amount": product.price * req.body.quantity.toFixed(2),
+                    "cartDetails.$.amount": (product.price * req.body.quantity).toFixed(2)
                 },
             },
             { new: true },
@@ -133,7 +134,7 @@ router.put ("/updateCartItem", auth, async (req, res) =>{
     const product = await Product.findById(_productId);
     Cart.findOneAndUpdate({_customerId: req.customerId, "cartDetails._product": _productId},
     {$set:{"cartDetails.$.quantity":quantity,
-            "cartDetails.$amount": quantity * product.price
+            "cartDetails.$.amount": (product.price * quantity).toFixed(2)
          }}, {new: true}
     ).populate(populate).exec((error, data)=>{
         if(error) return res.status(400).json({status:false, error});

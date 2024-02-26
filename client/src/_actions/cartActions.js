@@ -63,7 +63,7 @@ export default function useCarts() {
             return error.response?.data;
         }
     };
-    const clearCart=()=>{
+    const clearCart= ()=>{
         dispatch({
             type: CLEAR_CART_ITEM
         })

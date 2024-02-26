@@ -1,19 +1,19 @@
-import React from "react";
+import React, {useState} from "react";
 import {Button, Image, InputNumber, message, PageHeader, Space, Table, Typography} from "antd";
-import {DeleteTwoTone, EditTwoTone, SaveTwoTone, ReloadOutlined, DollarOutlined} from "@ant-design/icons";
-import {useSelector, useDispatch} from "react-redux";
+import {DeleteTwoTone, DollarOutlined, EditTwoTone, ReloadOutlined, SaveTwoTone} from "@ant-design/icons";
+import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
 import useCarts from "../_actions/cartActions"
 import {sumBy} from "lodash";
 import StripeCheckout from "react-stripe-checkout";
 import useOrders from "../_actions/orderActions";
+
 function Cart() {
     const navigate = useNavigate();
     const {updateCartItem, removeCartItem, clearCart} = useCarts();
     const dispatch = useDispatch();
-    const {checkout}=useOrders();
-    const auth=useSelector((state)=>state.customer.auth)
+    const {checkout} = useOrders();
+    const auth = useSelector((state) => state.customer.auth)
     const cartItems = useSelector((state) => state.cart.cartItems?.cartDetails);
     const [editItem, setEditItem] = useState(null);
     const [quantity, setQuantity] = useState(null);
@@ -23,33 +23,33 @@ function Cart() {
         setQuantity(item.quantity)
     };
     const handleRemove = (item) => {
-        dispatch(removeCartItem(item._product._id)).then(res=>{
-            if(res.payload.message){
+        dispatch(removeCartItem(item._product._id)).then(res => {
+            if (res.payload.message) {
                 message.success(res.payload.message);
-            }else{
+            } else {
                 message.error(res.payload.message)
             }
         })
     };
-    const handleReset =()=>{
+    const handleReset = () => {
         setEditItem(null)
     }
-    const handleQuantityChange =(value)=>{
+    const handleQuantityChange = (value) => {
         setQuantity(value);
 
     }
-    const handleUpdateCartItem =(item)=>{
-        const data={
+    const handleUpdateCartItem = (item) => {
+        const data = {
             _productId: item?._product?._id,
             quantity
         }
-        dispatch(updateCartItem(data)).then((res)=>
-        {if(res.payload.status){
-            message.success(res.payload.message);
-            setEditItem(null)
-        }else{
-            message.error(res.payload.message)
-        }
+        dispatch(updateCartItem(data)).then((res) => {
+            if (res.payload.status) {
+                message.success(res.payload.message);
+                setEditItem(null)
+            } else {
+                message.error(res.payload.message)
+            }
         })
     }
     const renderCartItems = () => {
@@ -57,11 +57,11 @@ function Cart() {
             <Table columns={columns} dataSource={cartItems} scroll={{x: 1300}}/>
         )
     }
-    const handlePayout=(token,data)=>{
-        dispatch(checkout({token,data})).then(res=>{
-            if(res.payload.status){
+    const handlePayout = (token, total) => {
+        dispatch(checkout({token, total})).then(res => {
+            if (res.payload.status) {
                 clearCart();
-            }else{
+            } else {
                 message.error(res.payload.message)
             }
         })
@@ -93,9 +93,9 @@ function Cart() {
         {
             title: "Quantity",
             width: 20,
-           align: 'left',
-            render:(item)=>{
-                if (editItem?._product?._id===item?._product?._id) {
+            align: 'left',
+            render: (item) => {
+                if (editItem?._product?._id === item?._product?._id) {
                     return (
                         <InputNumber size="small" min={1} value={quantity} onChange={handleQuantityChange}/>
                     )
@@ -117,38 +117,40 @@ function Cart() {
             render: (item) => {
                 return (
                     <>
-                        {editItem?._product?._id===item?._product?._id ?(
+                        {editItem?._product?._id === item?._product?._id ? (
                             <span style={{marginRight: 4}}>
-                                <SaveTwoTone style={{marginRight: 4, fontSize: 16}} onClick={()=>{handleUpdateCartItem(item)}}/>
-                                <ReloadOutlined style={{fontSize: 16, color:"green"}} onClick={handleReset}/>
+                                <SaveTwoTone style={{marginRight: 4, fontSize: 16}} onClick={() => {
+                                    handleUpdateCartItem(item)
+                                }}/>
+                                <ReloadOutlined style={{fontSize: 16, color: "green"}} onClick={handleReset}/>
                             </span>
-                        ):(
-                        <EditTwoTone style={{marginRight: 4, fontSize: 16}} twoToneColor="orange"
-                                     onClick={() => handleEdit(item)}/>)}
+                        ) : (
+                            <EditTwoTone style={{marginRight: 4, fontSize: 16}} twoToneColor="orange"
+                                         onClick={() => handleEdit(item)}/>)}
                         <DeleteTwoTone style={{fontSize: 16}} twoToneColor="red" onClick={() => handleRemove(item)}/>
                     </>
                 )
             }
         }
     ];
-    const renderCheckout=()=>{
-        const total=sumBy(cartItems,(item)=> item.amount);
-        if(cartItems?.length>0){
-            return(<center>
-            <p>Total amount: ${total}</p>
-            <StripeCheckout
-            name="Payment" email={auth?.data.email}
-            description="Payment for products" amount ={total*100}
-            token={(token)=> handlePayout(token,total)}
-            stripeKey='pk_test_51OifeWFz5hLXfkRKUrcOPjG4Ey5C7dgEpN5JrsZZvViDhnkmOD7oyKQYBy0kpBTutSdh6PC3Tc0AWa66ZsNI8Qxm00R63Ba9qV'>
-                <Button type ='primary' icon={<DollarOutlined/>}>Checkout</Button></StripeCheckout></center>)
+    const renderCheckout = () => {
+        const total = sumBy(cartItems, (item) => item.amount);
+        if (cartItems?.length > 0) {
+            return (<center>
+                <p>Total amount: ${total}</p>
+                <StripeCheckout
+                    name="Payment" email={auth?.data?.email}
+                    description="Payment for products" amount={total * 100}
+                    token={(token) => handlePayout(token, total)}
+                    stripeKey='pk_test_51OifeWFz5hLXfkRKUrcOPjG4Ey5C7dgEpN5JrsZZvViDhnkmOD7oyKQYBy0kpBTutSdh6PC3Tc0AWa66ZsNI8Qxm00R63Ba9qV'>
+                    <Button type='primary' icon={<DollarOutlined/>}>Checkout</Button></StripeCheckout></center>)
         }
     }
     return (
         <>
             <PageHeader title="Your Cart" onBack={() => navigate(-1)}/>
             <div className="page-wrapper">
-            {renderCartItems()}
+                {renderCartItems()}
                 {renderCheckout()}</div>
         </>
     )

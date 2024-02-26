@@ -5,17 +5,16 @@ import {
 
 const initialState = {
     order:null,
-    OrderHistory: null
+    orderHistory: null
 };
 
 const orderReducer = (state = initialState, action) => {
     switch (action.type) {
         case CHECKOUT:
-
             return {
-               order: {
+
                     order: action.payload.data
-                }}
+                }
 
         case GET_ORDER_HISTORY:
             return {
