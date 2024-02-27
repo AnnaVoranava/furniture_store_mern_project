@@ -19,40 +19,39 @@ const populate = {
 router.post('/checkout', auth,async (req, res)=>{
     console.log(req.customerId, "req.body.customerId")
     const data= await Cart.findOne({_customerId: req.customerId})
-console.log(data, "llllllllllllllllllllllll")
-        const token = req.body.token;
-        const totalAmount =req.body.totalPay;
-        const charge = await stripe.charges.create({
-            amount: 10000,
-            currency: 'usd',
-            description: 'Payment for product',
-            source: token.id,
-        });
-        const orderData ={
-            _customerId: data._customerId,
-            orderDetails: data.cartDetails,
-            paymentId: charge.id,
-            orderDate: new Date(),
-            totalAmount
+    const token = req.body.token;
+    const totalAmount =req.body.totalPay;
+    const charge = await stripe.charges.create({
+        amount: 10000,
+        currency: 'usd',
+        description: 'Payment for product',
+        source: token.id,
+    });
+    const orderData ={
+        _customerId: data._customerId,
+        orderDetails: data.cartDetails,
+        paymentId: charge.id,
+        orderDate: new Date(),
+        totalAmount
 
+    }
+    console.log(orderData, "orderData")
+
+    const newOrder = Order (orderData);
+    newOrder.save(async(error, data)=>{
+
+        if(error) return res.status(400).json({status: false,error});
+        else{
+            await Cart.deleteOne({
+                _customerId: req.customerId
+            });
+            return res.status(200).json({
+                status: true,
+                message:'Order has been created successfully ',
+                data
+            })
         }
-        console.log(orderData, "orderData")
-
-        const newOrder = Order (orderData);
-        newOrder.save(async(error, data)=>{
-
-            if(error) return res.status(400).json({status: false,error});
-            else{
-                await Cart.deleteOne({
-                    _customerId: req.customerId
-                });
-                return res.status(200).json({
-                    status: true,
-                    message:'Order has been created successfully ',
-                    data
-                })
-            }
-        })
+    })
 
 
 })
@@ -62,12 +61,12 @@ router.get ("/orderHistory", auth,(req,res)=>{
         .sort({orderDate:'desc'})
         .populate(populate)
         .exec((error, data)=>{
-    if(error) return res.status(400).json({status: false,error});
+            if(error) return res.status(400).json({status: false,error});
             return res.status(200).json({
-            status: true,
-            message: 'Get customer order history successfully', data
+                status: true,
+                message: 'Get customer order history successfully', data
+            })
         })
-    })
 })
 
 module.exports=router;
