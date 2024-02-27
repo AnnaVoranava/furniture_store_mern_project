@@ -16,13 +16,14 @@ const populate = {
         },
     },
 };
-router.post('/checkout', auth,(req, res)=>{
-    Cart.findOne({_customerId: req.customerId}).exec(async (data, error)=>{
-       if(error) return res.status(400).json({status:false, error})
+router.post('/checkout', auth,async (req, res)=>{
+    console.log(req.customerId, "req.body.customerId")
+    const data= await Cart.findOne({_customerId: req.customerId})
+console.log(data, "llllllllllllllllllllllll")
         const token = req.body.token;
-        const totalAmount =req.body.total;
+        const totalAmount =req.body.totalPay;
         const charge = await stripe.charges.create({
-            amount: totalAmount * 100,
+            amount: 10000,
             currency: 'usd',
             description: 'Payment for product',
             source: token.id,
@@ -35,8 +36,11 @@ router.post('/checkout', auth,(req, res)=>{
             totalAmount
 
         }
+        console.log(orderData, "orderData")
+
         const newOrder = Order (orderData);
         newOrder.save(async(error, data)=>{
+
             if(error) return res.status(400).json({status: false,error});
             else{
                 await Cart.deleteOne({
@@ -50,7 +54,7 @@ router.post('/checkout', auth,(req, res)=>{
             }
         })
 
-    })
+
 })
 
 router.get ("/orderHistory", auth,(req,res)=>{

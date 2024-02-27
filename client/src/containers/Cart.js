@@ -57,8 +57,8 @@ function Cart() {
             <Table columns={columns} dataSource={cartItems} scroll={{x: 1300}}/>
         )
     }
-    const handlePayout = (token, total) => {
-        dispatch(checkout({token, total})).then(res => {
+    const handlePayout = (token, totalPay) => {
+        dispatch(checkout({token, totalPay})).then(res => {
             if (res.payload.status) {
                 clearCart();
             } else {
@@ -134,14 +134,16 @@ function Cart() {
         }
     ];
     const renderCheckout = () => {
-        const total = sumBy(cartItems, (item) => item.amount);
+        const totalPay = sumBy(cartItems, (item) => item.amount);
+        console.log(totalPay)
         if (cartItems?.length > 0) {
             return (<center>
-                <p>Total amount: ${total}</p>
+                <p>Total amount: ${totalPay}</p>
                 <StripeCheckout
                     name="Payment" email={auth?.data?.email}
-                    description="Payment for products" amount={total * 100}
-                    token={(token) => handlePayout(token, total)}
+                    description="Payment for products"
+                    amount={totalPay * 100}
+                    token={(token) => handlePayout(token, totalPay)}
                     stripeKey='pk_test_51OifeWFz5hLXfkRKUrcOPjG4Ey5C7dgEpN5JrsZZvViDhnkmOD7oyKQYBy0kpBTutSdh6PC3Tc0AWa66ZsNI8Qxm00R63Ba9qV'>
                     <Button type='primary' icon={<DollarOutlined/>}>Checkout</Button></StripeCheckout></center>)
         }
